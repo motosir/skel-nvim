@@ -37,7 +37,10 @@ require("skel-nvim").setup{
   }
 }
 ```
-by default, the plugin expects templates to be under XDG\_CONFIG\_HOME/skeleton/, i.e. ~/.config/nvim/skeleton/  
+by default, the plugin 
+* expects templates to be under XDG\_CONFIG\_HOME/skeleton/, i.e. ~/.config/nvim/skeleton/  
+* for filenames matching `*.cpp` pattern it will look for ~/.config/nvim/skeleton/cpp.skel file
+* for filenames matching `*.h` pattern it will look for ~/.config/nvim/skeleton/h.skel file
 <br/>
 Example config for C/C++ development
 ```lua
@@ -270,9 +273,12 @@ require("skel-nvim").setup {
 }
 ```
 As you can see from this example the configuration very flexible to support per project customisation.
-* we can have different different per project files under root ../skeleton/ folder by overriding per project mappings or
+* we can have different per project template files under root ../skeleton/ folder by overriding per project mappings or
 * we can use the default mappings across all but handle any custom per project templates by placing them under
-subfolders with named after the project, i.e. ../skeleton/project1/, ../skeleton/project2/, etc...
+subfolders with named after the project, i.e. 
+    * ~/.config/nvim//skeleton/            // default 
+    * ~/.config/nvim/skeleton/project1/   // project 1 templates
+    * ~/.config/nvim/skeleton/project2/   // project 2 templates
 * project identification is based on path of new buffer being created and thus must provide key/val `path` for each per
 project configuration.
 
