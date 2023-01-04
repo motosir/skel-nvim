@@ -1,7 +1,7 @@
 local M = {}
 
-local Utils = require("skeletons-nvim.utils")
-local skeld = require("skeletons-nvim.defaults")
+local Utils = require("skel-nvim.utils")
+local skeld = require("skel-nvim.defaults")
 local config_path = vim.fn.stdpath("config")
 local skel_autogroup = vim.api.nvim_create_augroup("skel_autogroup", { clear = true })
 local buffer_state = {}

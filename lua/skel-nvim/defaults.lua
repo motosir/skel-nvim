@@ -7,7 +7,7 @@
 --   <inserts any user defined config in here>
 -- }
 
-local Utils = require("skeletons-nvim.utils")
+local Utils = require("skel-nvim.utils")
 local M = {}
 
 
