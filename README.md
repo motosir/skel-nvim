@@ -220,7 +220,7 @@ end
 
 -- user defined callback to provide a value for @PLACEHOLDER2@
 local function placeholder2_callback(config)
-  // the value of user defined custom_key will be different in global/project2
+  -- the value of user defined custom_key will be different in global/project1
   return config.custom_key
 end
 
@@ -250,9 +250,10 @@ require("skel-nvim").setup {
         path = "absolute/path/to/my/project1/"
 
         -- we can override all configuration in here, i.e.
+
         -- different mappings
         mappings = {
-            ['*.cpp'] = "alternate_cpp.skel"  -- can also provide per project root level temlate files
+            ['*.cpp'] = "alternate_cpp.skel"  -- can also provide per project root level template files
         },
 
         -- override placeholder substitutions
