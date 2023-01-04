@@ -219,7 +219,7 @@ local function project1_placeholder1_callback(config)
 end
 
 -- user defined callback to provide a value for @PLACEHOLDER2@
-local function project1_placeholder1_callback(config)
+local function placeholder2_callback(config)
   // the value of user defined custom_key will be different in global/project2
   return config.custom_key
 end
@@ -252,7 +252,7 @@ require("skel-nvim").setup {
         -- we can override all configuration in here, i.e.
         -- different mappings
         mappings = {
-            ['*.cpp'] = "alternate_cpp.skel"
+            ['*.cpp'] = "alternate_cpp.skel"  -- can also provide per project root level temlate files
         },
 
         -- override placeholder substitutions
@@ -267,4 +267,10 @@ require("skel-nvim").setup {
     }
   }
 }
+As you can see from this example the configuration very flexible to support per project customisation.
+* we can have different different per project files under root ../skeleton/ folder by overriding per project mappings or
+* we can use the default mappings across all but handle any custom per project templates by placing them under
+subfolders with named after the project, i.e. ../skeleton/project1/, ../skeleton/project2/, etc...
+* project identification is based on path of new buffer being created and thus must provide key/val `path` for each per
+project configuration.
 
