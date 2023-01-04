@@ -14,7 +14,7 @@ A skeleton plugin for nvim inspired by [vim-skeleton](https://github.com/noahfre
 * Supports concept of global/per-project config and templates.
 
 
-## install
+## Installation
 Using [plug](https://github.com/junegunn/vim-plug):
 
 ```vim
@@ -26,7 +26,7 @@ Using [packer](https://github.com/wbthomason/packer.nvim):
 ```lua
 use "motosir/skel-nvim"
 ```
-## config
+## Configuration
 basic config
 ```lua
 require("skel-nvim").setup{
@@ -142,7 +142,7 @@ private:
 #endif /* @CPP_HDR_GUARD@ */
 ```
 
-### placeholder callbacks functions
+### Placeholder callbacks functions
 placeholder callback functions are called with single table argument
 ```lua
 config = {
@@ -183,7 +183,7 @@ require("skel-nvim").setup{
 }
 
 ```
-### projects
+### Project support
 
 `skel-nvim` supports per project configration overrides and per project templates if needed
 
