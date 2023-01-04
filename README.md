@@ -65,6 +65,7 @@ require("skel-nvim").setup{
 
   -- substitutions in templates (default)
   -- can be a string or a callback function
+  -- these are the set of default placeholders provided by the plugin
   substitutions = {
     ['FILENAME']             = skeld.get_filename,
     ['NAME']                 = skeld.get_author,
@@ -77,7 +78,7 @@ require("skel-nvim").setup{
     ['NAMESPACE_CLOSE']      = skeld.get_namespaceclose,
   },
 
-  -- Misc config available to substitution callback functions
+  -- Misc global config available to substitution callback functions
   author = "MyName",
   namespace =  {"MyOrg", "MyApp"},
   -- Supports user varaibles too
@@ -88,7 +89,7 @@ require("skel-nvim").setup{
     project1 = {
       path = "/home/<user>/dev/proj1", -- absolute path for project1
       namespace = {"MyOrg", "Proj1"},  -- override namespace to use in1
-      author    = "my project1 name"      -- overide author only in proj1
+      author    = "my project1 name"   -- override author only in project1
     },
     project2 = {
       path = "/home/<user>/dev/proj2", -- absolute path for project2
@@ -98,7 +99,50 @@ require("skel-nvim").setup{
   }
 }
 ```
+Here we have a gobal config and 2 project overrides where some configurations are overriden.
+Projects are determined by `path`, that is 
+```
+:edit ~/home/dev/proj1/test.cpp  // will match `path` of project1 and will apply project1 config
+:edit ~/home/dev/proj2/test.cpp  // will match `path` of project2 and will apply project1 config
+:edit ~/home/dev/my_other_proj/test.cpp  // doens't match any project paths so will use default global config
+```
+
 ## Usage
+### templates
+By default, templates are expected to be found under ~/.config/nvim/skeleton/ folder.
+Placeholder variables need to be surrounded by '@', i.e. @FILENAME@
+Here's an example template file for C++,
+```cpp
+////////////////////////////////////////////////////////////////////////////////
+// File:        @FILENAME@
+// Author:      @NAME@
+// Description:       
+////////////////////////////////////////////////////////////////////////////////
+#ifndef @CPP_HDR_GUARD@
+#define @CPP_HDR_GUARD@
+////////////////////////////////////////////////////////////////////////////////
+
+@NAMESPACE_OPEN@
+
+//------------------------------------------------------------------------------
+
+class @CLASS_NAME@
+{
+
+public:
+    @CLASS_NAME@() = default;
+    ~@CLASS_NAME@() = default; 
+
+private:
+
+};
+
+//------------------------------------------------------------------------------
+
+@NAMESPACE_CLOSE@
+#endif /* @CPP_HDR_GUARD@ */
+```
+
 ### placeholder callbacks functions
 placeholder callback functions are called with single table argument
 ```lua
@@ -119,7 +163,7 @@ local function my_filename_callback(config)
 end
 
 -- using user defined key/val `my_user_key="my user value"`
-local function my_filename_callback(config)
+local function my_placeholder1_callback(config)
   return strings.uppper(config.my_user_key)
 end
 
@@ -140,4 +184,88 @@ require("skel-nvim").setup{
 }
 
 ```
-### per project
+### projects
+
+`skel-nvim` supports per project configration overrides and per project templates if needed
+
+let's say we have a basic template file cpp.skel
+```
+// filename: @FILENAME@
+// author:   @NAME@
+
+@PLACEHOLDER1@  // some usage of placeholder1 
+
+@PLACEHOLDER2@  // some usage of placeholder2
+```
+
+and we want to have different values of PLACEHOLDER1/2 depending on the project we're in
+
+```
+-- `skel-nvim` default callbacks
+local skel_defaults = require("skel-nvim.defaults")
+
+-- user defined callback
+local function my_filename_callback(config)
+  return vim.fs.basename(config.filename)
+end
+
+-- user defined callback to provide a value for @PLACEHOLDER1@
+local function default_placeholder1_callback(config)
+  return "MY PLACEHOLDER1 VALUE"
+end
+
+-- user defined callback to provide a value for @PLACEHOLDER1@ for project1
+local function project1_placeholder1_callback(config)
+  return "MY PROJECT1 PLACEHOLDER1 VALUE"
+end
+
+-- user defined callback to provide a value for @PLACEHOLDER2@
+local function project1_placeholder1_callback(config)
+  // the value of user defined custom_key will be different in global/project2
+  return config.custom_key
+end
+
+require("skel-nvim").setup {
+
+  mappings = {
+    ['main.cpp'] = "main.cpp.skel",
+    ['*.cpp'] = "cpp.skel",
+    ['*.h'] = "h.skel",
+  },
+  substitutions = {
+    ['FILENAME']             = skel_defaults.get_filename,
+    ['NAME']                 = "My Name",
+    ['PLACEHOLDER1']         = default_placeholder1_callback, -- user defined
+    ['PLACEHOLDER2']         = placeholder2_callback, -- user defined
+  },
+  custom_key = "default value",  -- this what we want output in @PLACEHOLDER2@
+
+  projects = {
+    -- By default templates are to be placesd under ~/.config/nvim/skeleton/
+    -- but with projects, an addtional folder ~/.config/nvim/nvim/skeleton/project1/
+    -- is also searched, if the required template is found under project template folder
+    -- it will attempt use that. if no project template file is found it will 
+    -- attempt find one under the root template folder.
+    project1 = {              
+        -- `path` to project is a required for each project
+        path = "absolute/path/to/my/project/"
+
+        -- we can override all configuration in here, i.e.
+        -- different mappings
+        mappings = {
+            ['*.cpp'] = "alternate_cpp.skel"
+        },
+
+        -- override placeholder substitutions
+        substitutions = {
+            ['FILENAME']             = my_filename_callback,    -- user callback
+            ['NAME']                 = "My Name",               -- can use hard-coded string 
+            ['PLACEHOLDER1']         = project1_placeholder1_callback, -- user defined and overridden from global config
+        },
+
+        -- override custom_key for project1
+        custom_key = "my project1 value",
+    }
+  }
+}
+
