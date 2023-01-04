@@ -37,10 +37,9 @@ require("skel-nvim").setup{
   }
 }
 ```
-by default, the plugin expects templates to be under XDG\_CONFIG\_HOME/skeleton/, i.e. ~/.config/nvim/skeleton/
-
-<br/><br/>
-example config for C/C++ development
+by default, the plugin expects templates to be under XDG\_CONFIG\_HOME/skeleton/, i.e. ~/.config/nvim/skeleton/  
+<br/>
+Example config for C/C++ development
 ```lua
 -- import basic default placeholder callbacks
 local skeld = require("skel-nvim.defaults")
@@ -108,9 +107,9 @@ Projects are determined by `path`, that is
 ```
 
 ## Usage
-### templates
-By default, templates are expected to be found under ~/.config/nvim/skeleton/ folder.
-Placeholder variables need to be surrounded by '@', i.e. @FILENAME@
+### Templates
+By default, templates are expected to be found under ~/.config/nvim/skeleton/ folder.  
+Placeholder variables need to be surrounded by '@', i.e. @FILENAME@  
 Here's an example template file for C++,
 ```cpp
 ////////////////////////////////////////////////////////////////////////////////
@@ -154,7 +153,7 @@ config = {
 }
 
 ``` 
-below example shows how write your own callbacks
+below example shows how to write your own callbacks
 
 ```lua
 -- calbacks take single `table` argument as described in previous section
@@ -200,7 +199,7 @@ let's say we have a basic template file cpp.skel
 
 and we want to have different values of PLACEHOLDER1/2 depending on the project we're in
 
-```
+```lua
 -- `skel-nvim` default callbacks
 local skel_defaults = require("skel-nvim.defaults")
 
@@ -244,11 +243,11 @@ require("skel-nvim").setup {
     -- By default templates are to be placesd under ~/.config/nvim/skeleton/
     -- but with projects, an addtional folder ~/.config/nvim/nvim/skeleton/project1/
     -- is also searched, if the required template is found under project template folder
-    -- it will attempt use that. if no project template file is found it will 
+    -- it will use that. If no project template file is found it will 
     -- attempt find one under the root template folder.
     project1 = {              
         -- `path` to project is a required for each project
-        path = "absolute/path/to/my/project/"
+        path = "absolute/path/to/my/project1/"
 
         -- we can override all configuration in here, i.e.
         -- different mappings
