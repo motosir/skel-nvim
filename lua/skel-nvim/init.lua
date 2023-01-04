@@ -267,7 +267,7 @@ end
 local function register_mapping(pattern, skeleton_file)
   vim.api.nvim_create_autocmd({ "BufNewFile" }, {
     pattern = {pattern},
-    callback = function() require('skeletons-nvim').handle_new_file(pattern, skeleton_file) end,
+    callback = function() require('skel-nvim').handle_new_file(pattern, skeleton_file) end,
     group = skel_autogroup
   })
 end
