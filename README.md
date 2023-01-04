@@ -268,6 +268,7 @@ require("skel-nvim").setup {
     }
   }
 }
+```
 As you can see from this example the configuration very flexible to support per project customisation.
 * we can have different different per project files under root ../skeleton/ folder by overriding per project mappings or
 * we can use the default mappings across all but handle any custom per project templates by placing them under
