@@ -106,26 +106,36 @@ config = {
   filename  = <absolute path of buffer file>,
   author    = <name provided in 'author' in setup config>,
   namespace = <ns provided in 'namespace' in setukp config>,
-  <inserts any user defined config in here>
+  <user defined values>
 }
 
 ``` 
 below example shows how write your own callbacks
 
 ```lua
+-- calbacks take single `table` argument as described in previous section
 local function my_filename_callback(config)
   return vim.fs.basename(config.filename)
 end
 
+-- using user defined key/val `my_user_key="my user value"`
+local function my_filename_callback(config)
+  return strings.uppper(config.my_user_key)
+end
+
 require("skel-nvim").setup{
+  -- user defined key/value
+  my_user_key = "my user value",     -- user defined key/vals are avilable in placeholder callbacks
+
   mappings = {
     ['main.cpp'] = "main.cpp.skel",
     ['*.cpp'] = "cpp.skel",
     ['*.h'] = "h.skel",
   },
   substitutions = {
-    ['FILENAME']             = my_filename_callback, -- user callback
-    ['NAME']                 = "My Name"             -- can use hard-coded string 
+    ['FILENAME']             = my_filename_callback,    -- user callback
+    ['NAME']                 = "My Name",               -- can use hard-coded string 
+    ['MYPLACEHOLDER1']       = my_placeholder1_callback -- in the template @MYPLACEHOLDER1@ will be replaced with "MY USER VALUE"
   }
 }
 
