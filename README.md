@@ -18,13 +18,13 @@ A skeleton plugin for nvim inspired by [vim-skeleton](https://github.com/noahfre
 Using [plug](https://github.com/junegunn/vim-plug):
 
 ```vim
-Plug 'nvim-lua/plenary.nvim'
+Plug 'motosir/skel-nvim'
 ```
 
 Using [packer](https://github.com/wbthomason/packer.nvim):
 
 ```lua
-use "nvim-lua/plenary.nvim"
+use "motosir/skel-nvim"
 ```
 ## config
 basic config
