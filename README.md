@@ -40,9 +40,8 @@ require("skel-nvim").setup{
 by default, the plugin 
 * expects template files to be under XDG\_CONFIG\_HOME/skeleton/, i.e. ~/.config/nvim/skeleton/  
 * for filenames matching `*.cpp` pattern it will look for ~/.config/nvim/skeleton/cpp.skel file
-* for filenames matching `*.h` pattern it will look for ~/.config/nvim/skeleton/h.skel file
+* for filenames matching `*.h` pattern it will look for ~/.config/nvim/skeleton/h.skel file  
 
-<br/>
 Example config for C/C++ development  
 ```lua
 -- import basic default placeholder callbacks
