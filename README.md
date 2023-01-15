@@ -124,9 +124,7 @@ Projects are determined by `path`, that is
 | SkelDisable | Disable auto loading of templates when pattern is matched            |
 | SkelStatus  | Check if auto loading is enabled                                     |
 | SkelEdit    | If template auto loading is disabled, SkelEdit <filename> can be used to create file and apply template |
-| SkelRun     | If template auto loading is disabled, SkelRun can be used to apply template on empty buffer with a
-filename, this covers use cases such as nvim-tree used to create a new empty file and then loaded into vim as two
-operations |
+| SkelRun     | If template auto loading is disabled, SkelRun can be used to apply template on empty buffer with a filename, this covers use cases such as nvim-tree used to create a new empty file and then loaded into vim as two operations |
 
 
 ## Usage
