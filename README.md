@@ -33,8 +33,9 @@ require("skel-nvim").setup{
   -- file pattern -> template mappings
   mappings = {
     ['*.cpp'] = "cpp.skel",
-    ['*.h']   = "h.skel"
-  }
+    ['*.h']   = "h.skel",
+    -- patterns can map to multiple templates
+    ['LICENSE'] = {"license.mit.skel", "license.gpl.skel" }
 }
 ```
 by default, the plugin 
@@ -42,6 +43,8 @@ by default, the plugin
 * for filenames matching `*.cpp` pattern it will look for ~/.config/nvim/skeleton/cpp.skel file
 * for filenames matching `*.h` pattern it will look for ~/.config/nvim/skeleton/h.skel file  
 
+If multiple templates are specified, vim.ui.select is used to allow user to choose which template to use.  
+\  
 Example config for C/C++ development  
 ```lua
 -- import basic default placeholder callbacks
@@ -50,6 +53,12 @@ local skeld = require("skel-nvim.defaults")
 require("skel-nvim").setup{
   -- dir containing skeleton files (default)
   templates_dir = vim.fn.stdpath("config") .. "/skeleton",
+
+  -- enable/disable plugin, this supercedes disable_for_empty_file (default)
+  skel_enabled = true,
+
+  -- enable/disable processing for bufread + empty file case (default)
+  apply_skel_for_empty_file = true,
 
   -- file pattern -> template mappings (default)
   mappings = {
@@ -108,6 +117,18 @@ Projects are determined by `path`, that is
 :edit ~/home/dev/proj2/test.cpp  // will match `path` of project2 and will apply project1 config
 :edit ~/home/dev/my_other_proj/test.cpp  // doens't match any project paths so will use default global config
 ```
+## Commands
+|-------------|----------------------------------------------------------------------|
+|Command      | Description                                                          |
+|-------------|----------------------------------------------------------------------|
+| SkelEnable  | Enable auto loading of templates when pattern is matched (default)   |
+| SkelDisable | Disable auto loading of templates when pattern is matched            |
+| SkelStatus  | Check if auto loading is enabled                                     |
+| SkelEdit    | If template auto loading is disabled, SkelEdit <filename> can be <br/> used to create file and apply template |
+| SkelRun     | If template auto loading is disabled, SkelRun can be used to apply <br>/ template on empty buffer with a
+filename, this covers use cases such as nvim-tree used to create a new empty file and then loaded into vim as two
+operations |
+
 
 ## Usage
 ### Templates
@@ -146,7 +167,7 @@ private:
 ```
 
 ### Placeholder callbacks functions
-placeholder callback functions are called with single table argument
+placeholder callback functions are called with single `table` argument
 ```lua
 config = {
   filename  = <absolute path of buffer file>,

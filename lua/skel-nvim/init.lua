@@ -2,12 +2,19 @@ local M = {}
 
 local Utils = require("skel-nvim.utils")
 local skeld = require("skel-nvim.defaults")
+local Picker = require("skel-nvim.picker")
 local config_path = vim.fn.stdpath("config")
 local skel_autogroup = vim.api.nvim_create_augroup("skel_autogroup", { clear = true })
 local buffer_state = {}
+local skel_enabled = true
+local apply_skel_for_empty_file = true
 
 -- this extended/overriden by user config
 local default_config = {
+  -- enable/disable plugin, this supercedes disable_for_empty_file
+  skel_enabled = true,
+  -- enable/disable processing for bufread + empty file
+  apply_skel_for_empty_file = true,
   -- dir containing skeleton files
   templates_dir = config_path .. "/skeleton",
   -- file pattern -> template mapping
@@ -49,6 +56,8 @@ local default_config = {
 
 -- used to differentiate between plugin/user keys
 local plugin_keys = {
+  skel_enabled = true,
+  apply_skel_for_empty_file = true,
   project = true,
   projects = true,
   path = true,
@@ -62,7 +71,7 @@ local plugin_keys = {
 -- this is overriden by setup
 local runtime_config = default_config
 
--- cache current buffer config
+-- cache for current buffer config
 local current_config = nil
 
 -- compares filename to pattern see if they match
@@ -103,8 +112,8 @@ local function find_match(filename, pattern)
 
 end
 
--- using current buffer filenaem attempts to
--- find best match for filename pattern
+-- using current buffer filename attempts to
+-- find best matched filename pattern
 local function find_best_matching(filename)
   if not filename then
     filename = "main.cpp"
@@ -175,10 +184,10 @@ local function set_current_config()
   end
 
   if proj ~= nil then
-    print (proj.project)
+    -- print (proj.project)
     return proj
   else
-    print (runtime_config['default'].project)
+    -- print (runtime_config['default'].project)
     return runtime_config['default']
   end
 
@@ -203,8 +212,7 @@ local function build_callback_config(config, filename)
   return callback
 end
 
--- Main handler for BufNewFile events
-function M.handle_new_file(pattern, skeleton_file)
+local function load_template_file(template_file)
 
   local bufnr = vim.api.nvim_get_current_buf()
 
@@ -213,27 +221,21 @@ function M.handle_new_file(pattern, skeleton_file)
     return
   end
 
-  local filename = vim.fn.expand("%")
   local abspath = vim.fn.expand("%:p")
-
-  -- we can have multiple patterns that match this filenam, we need
-  -- try to find best match and apply it's skeleton file
-  local res = find_best_matching(filename)
-  if not res["matched"] then
+  if abspath == nil or abspath == "" then
     return
   end
+  local config  = M.get_config()
 
-  local config = M.get_config()
+  local proj_file = config.templates_dir.."/"..template_file
+  local default_file = default_config.templates_dir.."/"..template_file
 
-  local proj_file = config.templates_dir.."/"..res['template']
-  local default_file = default_config.templates_dir.."/"..res['template']
-
-  local template_file = proj_file
-  if not Utils.fileexists(template_file) then
-    template_file = default_file
+  local template_path = proj_file
+  if not Utils.fileexists(template_path) then
+    template_path = default_file
   end
 
-  local fh = io.open(template_file)
+  local fh = io.open(template_path)
   local lines = {}
   if fh == nil then return end
 
@@ -263,11 +265,82 @@ function M.handle_new_file(pattern, skeleton_file)
   current_config = nil
 end
 
+
+-- Main handler for BufNewFile events
+function M.handle_new_file(pattern, skeleton_file, manual)
+
+  if not manual and not skel_enabled then return end
+
+  local bufnr = vim.api.nvim_get_current_buf()
+
+  -- if we've already processed this buffer ignore other patterns that match this file
+  if buffer_state[bufnr] then
+    return
+  end
+
+  local filename = vim.fn.expand("%")
+  local abspath = vim.fn.expand("%:p")
+
+  -- we can have multiple patterns that match this filenam, we need
+  -- try to find best match and apply it's skeleton file
+  local res = find_best_matching(filename)
+  if not res["matched"] then
+    return
+  end
+
+
+  local template_file = res['template']
+
+  if type(res['template']) == "table" then
+    local num_entries = Utils.size(res['template'])
+    if num_entries < 1 then
+      return
+    elseif num_entries == 1 then
+      template_file = res['template'][1]
+    else
+      Picker.get_selection2(res['template'], load_template_file)
+      return
+    end
+  end
+
+  load_template_file(template_file)
+end
+
+-- This should only apply skeleton if we've read a buffer
+--  * buffer is not a new file
+--  * buffer is however empty
+-- This is common use case when creating a new file using nvim-tree
+-- and then loading opening/reading the empty buffer
+function M.handle_buff_read(pattern, skeleton_file, manual)
+
+  if not manual and not skel_enabled then return end
+  if not manual and not apply_skel_for_empty_file then return end
+
+  local num_lines = vim.api.nvim_buf_line_count(0)
+  if num_lines ~= 1 then
+    return
+  end
+  local line_data = vim.api.nvim_buf_get_lines(0, 0, 1, 0)
+  if string.len(line_data[1]) ~= 0 then
+    return
+  end
+
+  M.handle_new_file(pattern, skeleton_file, manual)
+  -- print ("Num Lines:", num_lines, "Line1:", string.len(line_data[1]))
+  -- if buf
+end
+
+
 -- register pattern with BufNewFile
 local function register_mapping(pattern, skeleton_file)
   vim.api.nvim_create_autocmd({ "BufNewFile" }, {
     pattern = {pattern},
-    callback = function() require('skel-nvim').handle_new_file(pattern, skeleton_file) end,
+    callback = function() M.handle_new_file(pattern, skeleton_file, false) end,
+    group = skel_autogroup
+  })
+  vim.api.nvim_create_autocmd({ "BufRead" }, {
+    pattern = {pattern},
+    callback = function() M.handle_buff_read(pattern, skeleton_file, false) end,
     group = skel_autogroup
   })
 end
@@ -368,6 +441,46 @@ function M.setup(config)
     register_mapping(k, v)
   end
 
+  skel_enabled = default_config.skel_enabled
+  apply_skel_for_empty_file = default_config.apply_skel_for_empty_file
+
+end
+
+-- Commands --
+
+-- SkelEnable
+function M.enable()
+  skel_enabled = true
+end
+
+-- SkelDisable
+function M.disable()
+  skel_enabled = false
+end
+
+-- SkelStatus
+function M.status()
+  vim.notify("skel status="..tostring(skel_enabled), vim.log.levels.INFO, {})
+  return skel_enabled
+end
+
+-- SkelRun
+function M.run_on_current_buffer()
+  local abspath = vim.fn.expand("%:p")
+  if abspath == nil or abspath == "" then
+    vim.notify("skel: current buffer must have a valid filename", vim.log.levels.INFO, {})
+    return
+  end
+
+  M.handle_buff_read("", abspath, true)
+end
+
+-- SkelEdit
+function M.create_file(opts)
+  vim.cmd(":e "..opts.args)
+  if not skel_enabled then
+    M.handle_buff_read("", vim.fn.expand("%:p"), true)
+  end
 end
 
 return M
