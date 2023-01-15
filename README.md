@@ -118,14 +118,13 @@ Projects are determined by `path`, that is
 :edit ~/home/dev/my_other_proj/test.cpp  // doens't match any project paths so will use default global config
 ```
 ## Commands
-|-------------|----------------------------------------------------------------------|
 |Command      | Description                                                          |
 |-------------|----------------------------------------------------------------------|
 | SkelEnable  | Enable auto loading of templates when pattern is matched (default)   |
 | SkelDisable | Disable auto loading of templates when pattern is matched            |
 | SkelStatus  | Check if auto loading is enabled                                     |
-| SkelEdit    | If template auto loading is disabled, SkelEdit <filename> can be <br/> used to create file and apply template |
-| SkelRun     | If template auto loading is disabled, SkelRun can be used to apply <br>/ template on empty buffer with a
+| SkelEdit    | If template auto loading is disabled, SkelEdit <filename> can be used to create file and apply template |
+| SkelRun     | If template auto loading is disabled, SkelRun can be used to apply template on empty buffer with a
 filename, this covers use cases such as nvim-tree used to create a new empty file and then loaded into vim as two
 operations |
 
