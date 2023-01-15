@@ -43,8 +43,8 @@ by default, the plugin
 * for filenames matching `*.cpp` pattern it will look for ~/.config/nvim/skeleton/cpp.skel file
 * for filenames matching `*.h` pattern it will look for ~/.config/nvim/skeleton/h.skel file  
 
-If multiple templates are specified, vim.ui.select is used to allow user to choose which template to use.  
-\  
+If multiple templates are specified, `vim.ui.select` is used to allow user to choose which template to use.  
+\
 Example config for C/C++ development  
 ```lua
 -- import basic default placeholder callbacks
@@ -123,7 +123,7 @@ Projects are determined by `path`, that is
 | SkelEnable  | Enable auto loading of templates when pattern is matched (default)   |
 | SkelDisable | Disable auto loading of templates when pattern is matched            |
 | SkelStatus  | Check if auto loading is enabled                                     |
-| SkelEdit    | If template auto loading is disabled, `:SkelEdit \<filename\>` can be used to create file and apply template |
+| SkelEdit    | If template auto loading is disabled, `:SkelEdit <filename>` can be used to create file and apply template |
 | SkelRun     | If template auto loading is disabled, `:SkelRun` can be used to apply template on empty buffer with a filename, this covers use cases such as nvim-tree used to create a new empty file and then loaded into vim as two operations |
 
 
