@@ -298,7 +298,7 @@ function M.handle_new_file(pattern, skeleton_file, manual)
     elseif num_entries == 1 then
       template_file = res['template'][1]
     else
-      Picker.get_selection2(res['template'], load_template_file)
+      Picker.get_selection(res['template'], load_template_file)
       return
     end
   end
