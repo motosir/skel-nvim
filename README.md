@@ -92,7 +92,7 @@ require("skel-nvim").setup{
   -- Misc global config available to substitution callback functions
   author = "MyName",
   namespace =  {"MyOrg", "MyApp"},
-  -- Supports user varaibles too
+  -- Supports user variables too
   my_user_variable = "my_user_value",
 
   -- per project overrides (default = {})
